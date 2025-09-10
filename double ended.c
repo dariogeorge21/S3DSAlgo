@@ -1,112 +1,137 @@
 #include <stdio.h>
-#define max 5
+#define SIZE 5  
 
-int deque[max];
+int deque[SIZE];
 int front = -1, rear = -1;
 
-void insertfront() {
-    int item;
-    if (front == (rear + 1) % max) {
-        printf("overflow");
-        return;
-    }
-    printf("Enter the element ");
-    scanf("%d", &item);
-    if (front == -1) {
-        front = rear = 0;
-    } else if (front == 0) {
-        front = max - 1;
-    } else {
-        front--;
-    }
-    deque[front] = item;
+
+int isFull() {
+    return ((front == 0 && rear == SIZE - 1) || (front == rear + 1));
 }
 
-void insertrear() {
-    int item;
-    if (front == (rear + 1) % max) {
-        printf("overflow");
-        return;
-    }
-    printf("Enter the element ");
-    scanf("%d", &item);
-    if (front == -1) {
-        rear = front = 0;
-    } else {
-        rear = (rear + 1) % max;
-    }
-    deque[rear] = item;
+
+int isEmpty() {
+    return (front == -1);
 }
 
-void deletionfront() {
-    if (front == -1) {
-        printf("underflow");
+void insertFront(int value) {
+    if (isFull()) {
+        printf("Deque is FULL! Cannot insert %d at front.\n", value);
         return;
     }
-    printf("deleted element is %d", deque[front]);
-    if (front == rear) {
-        front = rear = -1;
-    } else {
-        front = (front + 1) % max;
+
+    if (front == -1) { 
+        front = 0;
+        rear = 0;
+    } 
+    else if (front == 0) {
+        front = SIZE - 1;
+    } 
+    else {
+        front = front - 1;
+    }
+
+    deque[front] = value;
+    printf("Inserted %d at front.\n", value);
+}
+
+
+void insertRear(int value) {
+    if (isFull()) {
+        printf("Deque is FULL! Cannot insert %d at rear.\n", value);
+        return;
+    }
+
+    if (front == -1) { 
+        front = 0;
+        rear = 0;
+    } 
+    else if (rear == SIZE - 1) {
+        rear = 0;
+    } 
+    else {
+        rear = rear + 1;
+    }
+
+    deque[rear] = value;
+    printf("Inserted %d at rear.\n", value);
+}
+
+
+void deleteFront() {
+    if (isEmpty()) {
+        printf("Deque is EMPTY! Cannot delete from front.\n");
+        return;
+    }
+
+    printf("Deleted %d from front.\n", deque[front]);
+
+    if (front == rear) { 
+        front = -1;
+        rear = -1;
+    } 
+    else if (front == SIZE - 1) {
+        front = 0;
+    } 
+    else {
+        front = front + 1;
     }
 }
 
-void deletionrear() {
-    if (front == -1) {
-        printf("underflow");
+
+void deleteRear() {
+    if (isEmpty()) {
+        printf("Deque is EMPTY! Cannot delete from rear.\n");
         return;
     }
-    printf("deleted element is %d", deque[rear]);
-    if (front == rear) {
-        front = rear = -1;
-    } else if (rear == 0) {
-        rear = max - 1;
-    } else {
-        rear--;
+
+    printf("Deleted %d from rear.\n", deque[rear]);
+
+    if (front == rear) { 
+        front = -1;
+        rear = -1;
+    } 
+    else if (rear == 0) {
+        rear = SIZE - 1;
+    } 
+    else {
+        rear = rear - 1;
     }
 }
+
 
 void display() {
-    if (front == -1) {
-        printf("queue is empty");
+    if (isEmpty()) {
+        printf("Deque is EMPTY.\n");
         return;
     }
-    printf("Queue Elements:");
-    for (int i = front;; i = (i + 1) % max) {
+
+    printf("Deque elements: ");
+    int i = front;
+    while (1) {
         printf("%d ", deque[i]);
-        if (i == rear)
-            break;
+        if (i == rear) break;
+        i = (i + 1) % SIZE;
     }
+    printf("\n");
 }
 
 int main() {
-    int choice;
-    do {
-        printf("\n1.insert at front\n2.insert at rear\n3.deletion from front\n4.deletion from rear\n5.Display\n6.Exit\n");
-        printf("Enter the Choice:");
-        scanf("%d", &choice);
-        switch (choice) {
-            case 1:
-                insertfront();
-                break;
-            case 2:
-                insertrear();
-                break;
-            case 3:
-                deletionfront();
-                break;
-            case 4:
-                deletionrear();
-                break;
-            case 5:
-                display();
-                break;
-            case 6:
-                printf("Exiting....");
-                break;
-            default:
-                printf("invalid Choice");
-        }
-    } while (choice != 6);
+    insertRear(10);
+    insertRear(20);
+    insertFront(5);
+    insertFront(2);
+    display();
+
+    deleteRear();
+    display();
+
+    deleteFront();
+    display();
+
+    insertRear(15);
+    insertFront(1);
+    display();
+
     return 0;
 }
