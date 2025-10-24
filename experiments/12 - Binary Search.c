@@ -1,34 +1,37 @@
 #include <stdio.h>
-
-int binarySearch(int arr[], int size, int target) {
-    int left = 0, right = size - 1;
-    
-    while (left <= right) {
-        int mid = left + (right - left) / 2;
-        
+int binarySearch(int arr[], int n, int target, int *comparisons) {
+    int low = 0, high = n - 1, mid;
+    *comparisons = 0;
+    while (low <= high) {
+        (*comparisons)++;
+        mid = (low + high) / 2;
         if (arr[mid] == target)
             return mid;
-        
-        if (arr[mid] < target)
-            left = mid + 1;
+        else if (arr[mid] < target)
+            low = mid + 1;
         else
-            right = mid - 1;
-    }
-    
-    return -1;
-}
-
+            high = mid - 1;}
+    return -1;}
 int main() {
-    int arr[] = {2, 3, 4, 10, 40};
-    int target = 10;
-    int size = sizeof(arr) / sizeof(arr[0]);
-    
-    int result = binarySearch(arr, size, target);
-    
-    if (result != -1)
-        printf("Element found at index %d\n", result);
+    int n, target, i, comparisons;
+    printf("Enter size of sorted array: ");
+    scanf("%d", &n);
+    int arr[n];
+    printf("Enter %d elements in sorted order:\n", n);
+    for (i = 0; i < n; i++)
+        scanf("%d", &arr[i]);
+    printf("Enter element to search: ");
+    scanf("%d", &target);
+    int index = binarySearch(arr, n, target, &comparisons);
+    if (index != -1)
+        printf("Element %d found at index %d\n", target, index);
     else
-        printf("Element not found\n");
-    
+        printf("Element %d not found\n", target);
+
+    int space_main = sizeof(n) + sizeof(target) + sizeof(i) + sizeof(comparisons) + sizeof(arr);
+    int space_function = sizeof(int) * 3;
+    int total_space = space_main + space_function;
+    printf("\n Time Complexity: %d\n", comparisons);
+    printf("Space Complexity: %d bytes\n", total_space);
     return 0;
 }
