@@ -86,6 +86,7 @@ int main(){
 	while (!isEmpty()){
 		postfix[j++]=pop();
 	}
+	postfix[j]='\0';
 	printf("Postfix expression: %s",postfix);
 	return 0;
 }
