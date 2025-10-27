@@ -1,84 +1,62 @@
-#include <stdio.h>
-
+#include<stdio.h>
 #define limit 6
 
-int QUEUE[limit];
+int queue[limit];
 int front = -1, rear = -1;
 
-int Overflow() {
-    return rear == limit - 1;
+int isFull(){
+    return (rear == limit - 1);
 }
 
-int Underflow() {
-    return (front == -1) || (front > rear);
+int isEmpty(){
+    return (front == -1 || front > rear);
 }
 
-void enqueue(int element) {
-    if (Overflow()) {
-        printf("Queue is full!!\n");
-    } else {
-        if (front == -1) {
-            front = 0;
-        }
-        rear++;
-        QUEUE[rear] = element;
-        printf("\nElement has been added successfully!!\n\n");
+void enqueue(int n){
+    if (isFull()) {
+        printf("Queue is full! Cannot insert %d\n", n);
+        return;
+    }
+    if (front == -1) front = 0;
+    rear++;
+    queue[rear] = n;
+    printf("Element %d inserted to queue\n", n);
+}
+
+void dequeue(){
+    if (isEmpty()) {
+        printf("Queue is empty! Cannot dequeue\n");
+        return;
+    }
+    printf("Element %d dequeued\n", queue[front]);
+    front++;
+    
+    // Reset queue when empty
+    if (front > rear) {
+        front = rear = -1;
     }
 }
 
-void dequeue() {
-    if (Underflow()) {
-        printf("Queue is empty!!\n");
-    } else {
-        printf("Deleted element is %d\n", QUEUE[front]);
-        front++;
-        if (front > rear) {
-            front = -1;
-            rear = -1;
-        }
+void display(){
+    if (isEmpty()) {
+        printf("Queue is empty\n");
+        return;
     }
+    printf("Queue elements: ");
+    for (int i = front; i <= rear; i++) {
+        printf("%d ", queue[i]);
+    }
+    printf("\n");
 }
 
-void display() {
-    if (Underflow()) {
-        printf("Queue is empty!!\n");
-    } else {
-        printf("Queue elements: ");
-        for (int i = front; i <= rear; i++) {
-            printf("%d\t", QUEUE[i]);
-        }
-        printf("\n");
-    }
-}
-
-int main() {
-    int flow = 1;
-    while (flow == 1) {
-        int option;
-        printf("\nChoose the operations for queue!!\n1. Enqueue\n2. Dequeue\n3. Display\n4. Exit\nOption: ");
-        scanf("%d", &option);
-        switch (option) {
-            case 1: {
-                int element;
-                printf("Enter the element to be added: ");
-                scanf("%d", &element);
-                enqueue(element);
-                break;
-            }
-            case 2:
-                dequeue();
-                break;
-            case 3:
-                display();
-                break;
-            case 4:
-                flow = 0;
-                break;
-            default:
-                printf("Wrong Option!! Exiting!!\n");
-                flow = 0;
-                break;
-        }
-    }
+int main(){
+    enqueue(10);
+    enqueue(20);
+    enqueue(30);
+    display();
+    
+    dequeue();
+    display();
+    
     return 0;
 }
