@@ -1,145 +1,60 @@
+// Sparse Matrix Representation and Operations - Addition and Transpose
+
 #include <stdio.h>
 
-struct Term {
+struct element{
     int row;
     int col;
-    int val;
+    int value;
 };
 
-void readSparse(struct Term mat[]) {
-    int n;
-
-    printf("Enter number of rows: ");
-    scanf("%d", &mat[0].row);
-
-    printf("Enter number of columns: ");
-    scanf("%d", &mat[0].col);
-
-    printf("Enter number of non-zero elements: ");
-    scanf("%d", &mat[0].val);
-
-    n = mat[0].val;
-
-    for (int i = 1; i <= n; i++) {
-        printf("Enter row, column, value for element %d: ", i);
-        scanf("%d %d %d", &mat[i].row, &mat[i].col, &mat[i].val);
+int main(){
+    int n1, n2;
+    printf("Enter the number of non-zero elements in the first sparse matrix: ");
+    scanf("%d", &n1);
+    struct element mat1[n1];
+    printf("Enter the row, column and value of non-zero elements of the first sparse matrix:\n");
+    for(int i=0; i<n1; i++){
+        printf("Element %d:\n", i+1);
+        printf("Row: ");
+        scanf("%d", &mat1[i].row);
+        printf("Column: ");
+        scanf("%d", &mat1[i].col);
+        printf("Value: ");
+        scanf("%d", &mat1[i].value);
     }
-}
-
-void displaySparse(struct Term mat[]) {
-    int n = mat[0].val;
-    int rows = mat[0].row;
-    int cols = mat[0].col;
-
-    printf("\nRow\tCol\tVal\n");
-    printf("%d\t%d\t%d\n", rows, cols, n);
-
-    for (int i = 1; i <= n; i++) {
-        printf("%d\t%d\t%d\n", mat[i].row, mat[i].col, mat[i].val);
+    printf("Enter the number of non-zero elements in the second sparse matrix: ");
+    scanf("%d", &n2);
+    struct element mat2[n2];
+    printf("Enter the row, column and value of non-zero elements of the second sparse matrix:\n");
+    for(int i=0; i<n2; i++){
+        printf("Element %d:\n", i+1);
+        printf("Row: ");
+        scanf("%d", &mat2[i].row);
+        printf("Column: ");
+        scanf("%d", &mat2[i].col);
+        printf("Value: ");
+        scanf("%d", &mat2[i].value);
     }
-}
-
-void addSparse(struct Term A[], struct Term B[], struct Term C[]) {
-    if (A[0].row != B[0].row || A[0].col != B[0].col) {
-        printf("\nAddition not possible! Dimensions mismatch.\n");
-        C[0].val = 0;
-        return;
-    }
-
-    int i = 1, j = 1, k = 1;
-
-    while (i <= A[0].val && j <= B[0].val) {
-        if ((A[i].row < B[j].row) ||
-            (A[i].row == B[j].row && A[i].col < B[j].col)) {
-            C[k++] = A[i++];
-        }
-        else if ((B[j].row < A[i].row) ||
-                 (B[j].row == A[i].row && B[j].col < A[i].col)) {
-            C[k++] = B[j++];
-        }
-        else {
-            C[k].row = A[i].row;
-            C[k].col = A[i].col;
-            C[k].val = A[i].val + B[j].val;
-            i++;
-            j++;
-            k++;
+    // Addition of two sparse matrices
+    struct element sum[n1 + n2];
+    for (int i = 0; i < n1+n2; i++){
+        if (mat1[i].row == mat2[i].row && mat1[i].col == mat2[i].col) {
+            sum[i].row = mat1[i].row;
+            sum[i].col = mat1[i].col;
+            sum[i].value = mat1[i].value + mat2[i].value;
+        } else {
+            sum[i].row = mat1[i].row;
+            sum[i].col = mat1[i].col;
+            sum[i].value = mat1[i].value;
+            sum[i].row = mat2[i].row;
+            sum[i].col = mat2[i].col;
+            sum[i].value = mat2[i].value;
         }
     }
-
-    while (i <= A[0].val) {
-        C[k++] = A[i++];
+    printf("The sum of the two sparse matrices is:\n");
+    for (int i = 0; i < n1+n2; i++){
+        printf("%d %d %d\n", sum[i].row, sum[i].col, sum[i].value);
     }
-
-    while (j <= B[0].val) {
-        C[k++] = B[j++];
-    }
-
-    C[0].row = A[0].row;
-    C[0].col = A[0].col;
-    C[0].val = k - 1;
-}
-
-void transposeSparse(struct Term M[], struct Term T[]) {
-    int n = M[0].val;
-
-    T[0].row = M[0].col;
-    T[0].col = M[0].row;
-    T[0].val = n;
-
-    int k = 1;
-
-    for (int i = 1; i <= M[0].col; i++) {
-        for (int j = 1; j <= n; j++) {
-            if (M[j].col == i) {
-                T[k].row = M[j].col;
-                T[k].col = M[j].row;
-                T[k].val = M[j].val;
-                k++;
-            }
-        }
-    }
-}
-
-int main() {
-    struct Term A[50], B[50], C[100], T[50];
-    int choice;
-
-    printf("Enter first sparse matrix (A):\n");
-    readSparse(A);
-
-    printf("\nEnter second sparse matrix (B):\n");
-    readSparse(B);
-
-    addSparse(A, B, C);
-
-    printf("\nMatrix A:");
-    displaySparse(A);
-
-    printf("\nMatrix B:");
-    displaySparse(B);
-
-    printf("\nMatrix C (A + B):");
-    displaySparse(C);
-
-    do {
-        printf("\n--- Transpose Menu ---\n");
-        printf("1. Transpose A\n");
-        printf("2. Transpose B\n");
-        printf("3. Transpose C\n");
-        printf("4. Exit\n");
-        printf("Enter your choice: ");
-        scanf("%d", &choice);
-
-        if (choice >= 1 && choice <= 3) {
-            if (choice == 1) transposeSparse(A, T);
-            else if (choice == 2) transposeSparse(B, T);
-            else transposeSparse(C, T);
-
-            printf("\nTranspose Result:");
-            displaySparse(T);
-        }
-    } while (choice != 4);
-
     return 0;
 }
