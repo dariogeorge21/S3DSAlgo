@@ -1,112 +1,165 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct Node {
-    int id;
-    int is_allocated;
-    struct Node* next;
-} Node;
+struct Block {
+    int size;
+    int isFree;
+    int pid;
+    struct Block *prev, *next;
+};
 
-Node* head = NULL;
+struct Block *head = NULL;
 
-void allocate(int id) {
-    Node* new_node = (Node*)malloc(sizeof(Node));
-    if (!new_node) {
-        printf("Memory allocation failed\n");
+struct Block* createBlock(int size) {
+    struct Block *newBlock = (struct Block*)malloc(sizeof(struct Block));
+    newBlock->size = size;
+    newBlock->isFree = 1;
+    newBlock->pid = -1;
+    newBlock->prev = newBlock->next = NULL;
+    return newBlock;
+}
+void insertBlock(int size) {
+    struct Block *newBlock = createBlock(size);
+    if (head == NULL) {
+        head = newBlock;
         return;
     }
-    new_node->id = id;
-    new_node->is_allocated = 1;
-    new_node->next = head;
-    head = new_node;
-    printf("Allocated block %d\n", id);
+    struct Block *temp = head;
+    while (temp->next != NULL) 
+        temp = temp->next;
+    temp->next = newBlock;
+    newBlock->prev = temp;
 }
-
-void free_block(int id) {
-    Node* current = head;
-    while (current != NULL) {
-        if (current->id == id && current->is_allocated == 1) {
-            current->is_allocated = 0;
-            printf("Freed block %d\n", id);
-            return;
-        }
-        current = current->next;
+void displayMemory() {
+    struct Block *temp = head;
+    printf("\nMemory Blocks:\n");
+    while (temp != NULL) {
+        if (temp->isFree)
+            printf("[ Free | Size: %d ] <-> ", temp->size);
+        else
+            printf("[ P%d | Size: %d ] <-> ", temp->pid, temp->size);
+        temp = temp->next;
     }
-    printf("Block %d not found or already freed\n", id);
+    printf("NULL\n");
 }
-
-void garbage_collect() {
-    Node *current = head, *prev = NULL;
-    while (current != NULL) {
-        if (current->is_allocated == 0) {
-            if (prev == NULL) {
-                head = current->next;
-                free(current);
-                current = head;
-            } else {
-                prev->next = current->next;
-                free(current);
-                current = prev->next;
-            }
-            printf("Garbage collected a freed block\n");
+void garbageCollector() {
+    struct Block *temp = head;
+    while (temp != NULL && temp->next != NULL) {
+        if (temp->isFree && temp->next->isFree) {
+            temp->size += temp->next->size;
+            struct Block *del = temp->next;
+            temp->next = del->next;
+            if (del->next != NULL)
+                del->next->prev = temp;
+            free(del);
         } else {
-            prev = current;
-            current = current->next;
+            temp = temp->next;
         }
     }
 }
-
-void display() {
-    Node* current = head;
-    printf("Current blocks:\n");
-    if (!current) {
-        printf("No blocks allocated.\n");
+void allocate(int pid, int size, int choice) {
+    struct Block *temp = head, *selected = NULL;
+    
+    if (choice == 1) {  // First Fit
+        while (temp != NULL) {
+            if (temp->isFree && temp->size >= size) {
+                selected = temp;
+                break;
+            }
+            temp = temp->next;
+        }
+    } else if (choice == 2) {  // Best Fit
+        int bestSize = 1e9;
+        while (temp != NULL) {
+            if (temp->isFree && temp->size >= size && temp->size < bestSize) {
+                bestSize = temp->size;
+                selected = temp;
+            }
+            temp = temp->next;
+        }
+    } else if (choice == 3) {  // Worst Fit
+        int worstSize = -1;
+        while (temp != NULL) {
+            if (temp->isFree && temp->size >= size && temp->size > worstSize) {
+                worstSize = temp->size;
+                selected = temp;
+            }
+            temp = temp->next;
+        }
+    }
+    
+    if (selected == NULL) {
+        printf("Process %d of size %d cannot be allocated\n", pid, size);
+        displayMemory();
         return;
     }
-    while (current != NULL) {
-        printf("Block ID: %d, Status: %s\n", current->id, current->is_allocated ? "Allocated" : "Freed");
-        current = current->next;
+    
+    if (selected->size > size) {
+        struct Block *newBlock = createBlock(selected->size - size);
+        newBlock->next = selected->next;
+        if (selected->next != NULL) 
+            selected->next->prev = newBlock;
+        newBlock->prev = selected;
+        selected->next = newBlock;
+        selected->size = size;
     }
-    printf("\n");
+    
+    selected->isFree = 0;
+    selected->pid = pid;
+    printf("Process %d allocated %d units\n", pid, size);
+    displayMemory();
 }
-
+void freeProcess(int pid) {
+    struct Block *temp = head;
+    int found = 0;
+    while (temp != NULL) {
+        if (temp->pid == pid) {
+            temp->isFree = 1;
+            temp->pid = -1;
+            found = 1;
+            printf("Process %d freed\n", pid);
+            break;
+        }
+        temp = temp->next;
+    }
+    if (!found) 
+        printf("Process %d not found\n", pid);
+    garbageCollector();
+    displayMemory();
+}
 int main() {
-    int choice, id;
+    int n, choice, size, pid = 1;
+    printf("Enter number of memory blocks: ");
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++) {
+        printf("Enter size of block %d: ", i + 1);
+        scanf("%d", &size);
+        insertBlock(size);
+    }
+    
     while (1) {
-        printf("Menu:\n");
-        printf("1. Allocate block\n");
-        printf("2. Free block\n");
-        printf("3. Garbage collect\n");
-        printf("4. Display blocks\n");
-        printf("5. Exit\n");
+        printf("\nMenu:\n");
+        printf("1. Allocate Process\t 2. Free Process\t 3. Exit\n");
         printf("Enter choice: ");
         scanf("%d", &choice);
-
-        switch (choice) {
-            case 1:
-                printf("Enter block ID to allocate: ");
-                scanf("%d", &id);
-                allocate(id);
-                break;
-            case 2:
-                printf("Enter block ID to free: ");
-                scanf("%d", &id);
-                free_block(id);
-                break;
-            case 3:
-                garbage_collect();
-                break;
-            case 4:
-                display();
-                break;
-            case 5:
-                printf("Exiting...\n");
-                return 0;
-            default:
-                printf("Invalid choice. Try again.\n");
+        
+        if (choice == 1) {
+            printf("Enter process size: ");
+            scanf("%d", &size);
+            printf("Choose allocation method: 1.First Fit 2.Best Fit 3.Worst Fit : ");
+            scanf("%d", &choice);
+            allocate(pid++, size, choice);
+        }
+        else if (choice == 2) {
+            printf("Enter process ID to free: ");
+            scanf("%d", &size);
+            freeProcess(size);
+        }
+        else if (choice == 3) {
+            break;
+        }
+        else {
+            printf("Invalid choice\n");
         }
     }
     return 0;
-}
-
