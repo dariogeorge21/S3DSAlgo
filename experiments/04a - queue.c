@@ -50,8 +50,7 @@ int main() {
     int flow = 1; 
     while (flow == 1) { 
         int option; 
-        printf("\nChoose the operations for queue:\n1. Enqueue\n2. Dequeue\n3. 
-Display\n4. Exit\nOption: "); 
+        printf("\nChoose the operations for queue:\n1. Enqueue\n2. Dequeue\n3. Display\n4. Exit\nOption: "); 
         scanf("%d", &option); 
         switch (option) { 
             case 1: { 
