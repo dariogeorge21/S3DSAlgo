@@ -1,68 +1,56 @@
-// find the sum of 2 polynomials using an structure!!
-
-#include<stdio.h>
-
-struct poly{
-    int coeff;
-    int exp;
-};
-
-int main(){
-    int n1, n2;
-    printf("Enter the number of terms in the first polynomial: ");
-    scanf("%d", &n1);
-    struct poly p1[n1];
-    printf("Enter the coefficients and exponents of the first polynomial: ");
-    for(int i=0; i<n1; i++){
-        printf("Coefficient %d: ", i+1);
-        scanf("%d", &p1[i].coeff);
-        printf("Exponent %d: ", i+1);
-        scanf("%d", &p1[i].exp);
-    }
-    printf("Enter the number of terms in the second polynomial: ");
-    scanf("%d", &n2);
-    struct poly p2[n2];
-    printf("Enter the coefficients and exponents of the second polynomial: ");
-    for(int i=0; i<n2; i++){
-        printf("Coefficient %d: ", i+1);
-        scanf("%d", &p2[i].coeff);
-        printf("Exponent %d: ", i+1);
-        scanf("%d", &p2[i].exp);
-    }
-    int max_exp;
-    for (int i =0,j=0;i<n1 && j<n2;i++,j++){
-        max_exp = (p1[i].exp > p2[j].exp) ? p1[i].exp : p2[j].exp;
-    }
-    struct poly sum[max_exp+1];
-    for (int i = 0; i <= max_exp; i++) {
-        sum[i].coeff = 0;
-        sum[i].exp = i;
-    }
-    for (int i = 0; i < max_exp; i++) {
-        if (p1[i].exp == p2[i].exp) {
-            sum[i].coeff = p1[i].coeff + p2[i].coeff;
-            sum[i].exp = p1[i].exp;
-        } else if (p1[i].exp > p2[i].exp) {
-            sum[i].coeff = p1[i].coeff;
-            sum[i].exp = p1[i].exp;
-        } else if (p1[i].exp < p2[i].exp) {
-            sum[i].coeff = p2[i].coeff;
-            sum[i].exp = p2[i].exp;
-        } else {
-            sum[i].coeff = 0;
-            sum[i].exp = 0;
-        }
-    }
-    printf("The sum of the polynomials is: ");
-    for(int i=0; i<max_exp; i++){
-        if(sum[i].coeff != 0){
-            printf("%dx^%d ", sum[i].coeff, sum[i].exp);
-            if(i<max_exp-1){
-                printf("+ ");
-            }
-        }
-    }
-    printf("\n");
-    
-    return 0;
-}
+#include <stdio.h> 
+struct polyTerm { 
+    int coeff; 
+    int exp; 
+}; 
+int main() { 
+    int t1, t2, i = 0, j = 0, k = 0; 
+    printf("Enter number of terms in first polynomial: "); 
+    scanf("%d", &t1); 
+    struct polyTerm poly1[t1]; 
+    printf("Enter coefficients and exponents for first polynomial:\n"); 
+    for (i = 0; i < t1; i++) { 
+        printf("Term %d coeff and exp: ", i + 1); 
+        scanf("%d %d", &poly1[i].coeff, &poly1[i].exp); 
+    } 
+    printf("Enter number of terms in second polynomial: "); 
+    scanf("%d", &t2); 
+    struct polyTerm poly2[t2]; 
+    printf("Enter coefficients and exponents for second polynomial:\n"); 
+    for (j = 0; j < t2; j++) { 
+        printf("Term %d coeff and exp: ", j + 1); 
+        scanf("%d %d", &poly2[j].coeff, &poly2[j].exp); 
+    } 
+    struct polyTerm poly3[t1 + t2];   
+      i = 0; j = 0; k = 0; 
+     while (i < t1 && j < t2) { 
+        if (poly1[i].exp == poly2[j].exp) { 
+            poly3[k].coeff = poly1[i].coeff + poly2[j].coeff; 
+            poly3[k].exp = poly1[i].exp; 
+            i++; j++; k++; 
+        } else if (poly1[i].exp > poly2[j].exp) { 
+            poly3[k] = poly1[i]; 
+            i++; k++;                                         
+        } else { 
+            poly3[k] = poly2[j]; 
+            j++; k++; 
+        } 
+    } 
+    while (i < t1) { 
+        poly3[k] = poly1[i]; 
+        i++; k++; 
+    }   
+    while (j < t2) { 
+        poly3[k] = poly2[j]; 
+        j++; k++; 
+    }   
+    printf("Sum of polynomials: "); 
+    for (int x = 0; x < k; x++) { 
+if (x != 0 && poly3[x].coeff >= 0) { 
+printf("+"); 
+} 
+printf("%d(x)^%d ", poly3[x].coeff, poly3[x].exp); 
+} 
+printf("\n"); 
+return 0; 
+} 

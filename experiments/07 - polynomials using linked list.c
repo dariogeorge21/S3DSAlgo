@@ -1,98 +1,118 @@
-// Polynomials using linked list
-
-#include <stdio.h>
-#include <stdlib.h>
-
-struct PolyNode {
-    int coeff;
-    int pow;
-    struct PolyNode* next;
-};
-
-struct PolyNode* createNode(int coeff, int pow) {
-    struct PolyNode* newNode = (struct PolyNode*)malloc(sizeof(struct PolyNode));
-    newNode->coeff = coeff;
-    newNode->pow = pow;
-    newNode->next = NULL;
-    return newNode;
-}
-
-void insertTerm(struct PolyNode** poly, int coeff, int pow) {
-    struct PolyNode* newNode = createNode(coeff, pow);
-    if (*poly == NULL) {
-        *poly = newNode;
-    } else {
-        struct PolyNode* temp = *poly;
-        while (temp->next != NULL)
-            temp = temp->next;
-        temp->next = newNode;
-    }
-}
-
-void displayPoly(struct PolyNode* poly) {
-    while (poly != NULL) {
-        printf("%dx^%d", poly->coeff, poly->pow);
-        poly = poly->next;
-        if (poly != NULL)
-            printf(" + ");
-    }
-    printf("\n");
-}
-
-struct PolyNode* addPolynomials(struct PolyNode* poly1, struct PolyNode* poly2) {
-    struct PolyNode* result = NULL;
-
-    while (poly1 != NULL && poly2 != NULL) {
-        if (poly1->pow > poly2->pow) {
-            insertTerm(&result, poly1->coeff, poly1->pow);
-            poly1 = poly1->next;
-        } else if (poly1->pow < poly2->pow) {
-            insertTerm(&result, poly2->coeff, poly2->pow);
-            poly2 = poly2->next;
-        } else {
-            int sum = poly1->coeff + poly2->coeff;
-            if (sum != 0)
-                insertTerm(&result, sum, poly1->pow);
-            poly1 = poly1->next;
-            poly2 = poly2->next;
-        }
-    }
-
-    while (poly1 != NULL) {
-        insertTerm(&result, poly1->coeff, poly1->pow);
-        poly1 = poly1->next;
-    }
-    while (poly2 != NULL) {
-        insertTerm(&result, poly2->coeff, poly2->pow);
-        poly2 = poly2->next;
-    }
-
-    return result;
-}
-
-int main() {
-    struct PolyNode* poly1 = NULL;
-    struct PolyNode* poly2 = NULL;
-    struct PolyNode* sum = NULL;
-
-    insertTerm(&poly1, 3, 3);
-    insertTerm(&poly1, 2, 2);
-    insertTerm(&poly1, 5, 0);
-
-    insertTerm(&poly2, 4, 2);
-    insertTerm(&poly2, 2, 1);
-    insertTerm(&poly2, 1, 0);
-
-    printf("Polynomial 1: ");
-    displayPoly(poly1);
-
-    printf("Polynomial 2: ");
-    displayPoly(poly2);
-
-    sum = addPolynomials(poly1, poly2);
-
-    printf("Sum: ");
-    displayPoly(sum);
-
-    return 0;
-}
+#include <stdio.h> 
+struct Node { 
+    int coeff; 
+    int exp; 
+    struct Node* link; 
+}; 
+int main() { 
+    struct Node poly1[10], poly2[10], poly3[20]; 
+    struct Node *pptr, *qptr; 
+    struct Node *head = NULL, *tail = NULL; 
+    int t1, t2, i, j, k = 0; 
+    printf("Enter the number of terms in the first polynomial: "); 
+    scanf("%d", &t1); 
+    for (i = 0; i < t1; i++) { 
+        printf("Enter the coefficient for term %d: ", i + 1); 
+        scanf("%d", &poly1[i].coeff); 
+        printf("Enter the exponent for term %d: ", i + 1); 
+        scanf("%d", &poly1[i].exp); 
+        if (i < t1 - 1) 
+            poly1[i].link = &poly1[i + 1]; 
+        else 
+            poly1[i].link = NULL;} 
+    printf("Enter the number of terms in the second polynomial: "); 
+    scanf("%d", &t2); 
+    for (j = 0; j < t2; j++) { 
+        printf("Enter the coefficient for term %d: ", j + 1); 
+        scanf("%d", &poly2[j].coeff); 
+        printf("Enter the exponent for term %d: ", j + 1); 
+        scanf("%d", &poly2[j].exp); 
+        if (j < t2 - 1) 
+            poly2[j].link = &poly2[j + 1]; 
+        else 
+            poly2[j].link = NULL;} 
+    pptr = poly1; 
+    qptr = poly2; 
+    while (pptr != NULL && qptr != NULL) { 
+        if (pptr->exp == qptr->exp) { 
+            int sum = pptr->coeff + qptr->coeff; 
+            if (sum != 0) { 
+                poly3[k].coeff = sum; 
+                poly3[k].exp = pptr->exp; 
+                poly3[k].link = NULL; 
+                if (head == NULL) { 
+                    head = &poly3[k]; 
+                    tail = head; 
+                } else { 
+                    tail->link = &poly3[k]; 
+                    tail = tail->link; 
+                } 
+                k++; 
+            } 
+            pptr = pptr->link; 
+            qptr = qptr->link; 
+        } else if (pptr->exp > qptr->exp) { 
+            poly3[k] = *pptr; 
+            poly3[k].link = NULL; 
+            if (head == NULL) { 
+                head = &poly3[k]; 
+                tail = head; 
+            } else { 
+                tail->link = &poly3[k]; 
+                tail = tail->link; 
+            } 
+            k++; 
+            pptr = pptr->link; 
+        } else { 
+            poly3[k] = *qptr; 
+            poly3[k].link = NULL; 
+            
+            if (head == NULL) { 
+                head = &poly3[k]; 
+                tail = head; 
+            } else { 
+                tail->link = &poly3[k]; 
+                tail = tail->link; 
+            } 
+            k++; 
+            qptr = qptr->link; 
+        }} 
+    while (pptr != NULL) { 
+        poly3[k] = *pptr; 
+        poly3[k].link = NULL; 
+ 
+        if (head == NULL) { 
+            head = &poly3[k]; 
+            tail = head; 
+        } else { 
+            tail->link = &poly3[k]; 
+            tail = tail->link; 
+        } 
+        k++; 
+        pptr = pptr->link; 
+    } 
+    while (qptr != NULL) { 
+        poly3[k] = *qptr; 
+        poly3[k].link = NULL; 
+ 
+        if (head == NULL) { 
+            head = &poly3[k]; 
+            tail = head; 
+        } else { 
+            tail->link = &poly3[k]; 
+            tail = tail->link; 
+        } 
+        k++; 
+        qptr = qptr->link; 
+    } 
+    struct Node* temp = head; 
+    printf("Resultant Polynomial: "); 
+    while (temp != NULL) { 
+        printf("%dx^%d", temp->coeff, temp->exp); 
+        if (temp->link != NULL) 
+            printf(" + "); 
+        temp = temp->link; 
+    } 
+    printf("\n"); 
+    return 0; 
+} 
