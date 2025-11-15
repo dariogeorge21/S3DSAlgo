@@ -70,8 +70,7 @@ int main() {
     int choice; 
     char url[MAX]; 
     while (1) { 
-        printf("\nMenu:\n 1.Visit New Page\n 2.Go Back\n 3.Go Forward\n 4.Display current 
-page \n 5.Exit \n"); 
+        printf("\nMenu:\n 1.Visit New Page\n 2.Go Back\n 3.Go Forward\n 4.Display current page \n 5.Exit \n"); 
         printf("Enter your choice: "); 
         if (scanf("%d", &choice) != 1) { 
             while (getchar() != '\n'); 
